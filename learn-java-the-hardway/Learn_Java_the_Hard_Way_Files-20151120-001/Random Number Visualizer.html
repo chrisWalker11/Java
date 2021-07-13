@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Random Number Visualizer</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+			margin-top: 20px;
+			margin-left: 10px;
+		}
+		.snippet td, .snippet input {
+			font: 24pt Consolas, Courier New, monospace;
+			text-align: center;
+		}
+		pre.snippet {
+			font: 20pt Consolas, Courier New, monospace;
+		}
+		.labels td, input.color {
+			font: 12pt Calibri, Arial, sans-serif;
+			text-align: center;
+		}
+		td.top {
+			vertical-align: top;
+		}
+		td span.k { color: rgb(0,0,240); }
+		.sliders input[type='range'] {
+			width: 80px;
+			
+		}
+	</style>
+</head>
+<body>
+	<p>Change the numbers or sliders and see what happens!</p>
+	<table>
+		<tr class=labels>
+			<td>
+			<td>origin
+			<td>
+			<td>quantity
+			<td>
+		</tr>
+		<tr class=snippet>
+			<td>&nbsp;&nbsp;&nbsp;
+			<td><input size=4 id='origin' value='50'>
+			<td>&nbsp;+ (<span class=k>int</span>)(&nbsp;
+			<td><input size=5 id='qty' value='300'>
+			<td>*Math.random() );
+		</tr>
+		<tr class=sliders>
+			<td>
+			<td><input type="range" value="50"  id="originSlide" min="0" max="200" step="1">
+			<td>
+			<td><input type="range" value="300"  id="qtySlide"    min="1" max="1000" step="1">
+			<td>
+		</tr>
+	</table>
+<pre class=snippet>
+ // Simplifies to one value randomly chosen from <span id='low1'>50</span> to <span id='high1'>349</span>
+ // There are <span id='qty2'>300</span> possible values
+ // The smallest possible value is <span id='low2'>50</span>.
+ // The largest possible value is <span id='high2'>349</span>.
+ 
+ // Here are some samples: <button type='button' onclick="redoSamples(); return false;">Redo Samples</button>
+ // 	<span id='samples'>327	266	190	289	67	275	239</span>
+</pre>
+	<script type='text/javascript'>
+		"use strict";
+		var origin, qty, lo, hi, prevOrigin = -999, prevQty = -999;
+		var slidingOrigin = false;
+		var slidingQty = false;
+		var samples = [ 327, 266, 190, 289, 67, 275, 239 ];
+
+		function update() {
+			if ( slidingOrigin ) {
+				document.getElementById('origin').value = document.getElementById('originSlide').value;
+			}
+			else {
+				document.getElementById('originSlide').value = document.getElementById('origin').value;
+			}
+			if ( slidingQty ) {
+				document.getElementById('qty').value = document.getElementById('qtySlide').value;
+			}
+			else {
+				document.getElementById('qtySlide').value = document.getElementById('qty').value;
+			}
+
+			origin = s2i( document.getElementById('origin').value );
+			qty    = s2i( document.getElementById('qty').value );
+			lo = origin;
+			hi = (qty-1)+lo;
+			document.getElementById('low1').textContent = lo;
+			document.getElementById('low2').textContent = lo;
+			document.getElementById('high1').textContent = hi;
+			document.getElementById('high2').textContent = hi;
+			document.getElementById('qty2').textContent = qty;
+			if ( qty != prevQty || origin != prevOrigin ) {
+				redoSamples();
+				prevOrigin = origin;
+				prevQty = qty;
+			}
+		}
+
+		function s2i( s ) {
+			var n = 0;
+			if ( s.length > 0 ) {
+				var test = parseInt(s, 10);
+				if ( ! isNaN(test) )
+					n = test;
+			}
+			return n;
+		}
+		
+		function redoSamples() {
+			for ( var i=0; i<samples.length; i++ ) {
+				samples[i] = origin + Math.floor( Math.random()*qty );
+			}
+			document.getElementById('samples').textContent = samples.join("\t");
+		}
+
+		function draggOrigin() { slidingOrigin = true; }
+		function donedraggOrigin() {
+			slidingOrigin = false;
+			document.getElementById('origin').value = document.getElementById('originSlide').value;
+		}
+
+		function draggQty() { slidingQty = true; }
+		function donedraggQty() {
+			slidingQty = false;
+			document.getElementById('qty').value = document.getElementById('qtySlide').value;
+		}
+
+		function main() {
+			document.getElementById('originSlide').addEventListener('input', draggOrigin);
+			document.getElementById('originSlide').addEventListener('change', donedraggOrigin);
+			document.getElementById('qtySlide').addEventListener('input', draggQty);
+			document.getElementById('qtySlide').addEventListener('change', donedraggQty);
+			setInterval(function() { update(); }, 1000/60);
+		}
+
+		main();
+	</script>
+</body>
+</html>
